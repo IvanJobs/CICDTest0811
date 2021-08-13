@@ -3,6 +3,7 @@
 name: 'Continuous Deployment'
 on:
   # When new commits are pushed onto the main branch.
+  workflow_dispatch:
   push:
     branches:
       - master
