@@ -55,7 +55,7 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "chore: commit provision configs"
-          file_pattern: .fx/*
+          file_pattern: .fx/env.default.json
       
       - name: Upload default.userdata as artifact
         uses: actions/upload-artifact@v2
