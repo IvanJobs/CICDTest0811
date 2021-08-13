@@ -1,4 +1,4 @@
-# This is just an example workflow for continuous deployment.
+# This is just an example workflow for continous deployment.
 # You should customize it to meet your own requirements.
 name: 'Continuous Deployment'
 on:
@@ -9,7 +9,6 @@ on:
 jobs:
   buildAndPublish:
     runs-on: ubuntu-latest
-    environment: test_environment
     env:
       AZURE_ACCOUNT_NAME: ${{secrets.AZURE_ACCOUNT_NAME}}
       AZURE_ACCOUNT_PASSWORD: ${{secrets.AZURE_ACCOUNT_PASSWORD}}
@@ -32,14 +31,14 @@ jobs:
       # Different folder structures require different commands set.
       # 'npm ci' is used here to install dependencies and it depends on package-lock.json.
       # If you prefer to use 'npm ci', please make sure to commit package-lock.json first, or just change it to 'npm install'.
-      # - name: Build the project
-      #   run: cd tabs && npm install && npm run build
+      #- name: Build the project
+      #  run: cd tabs && npm install && npm run build
 
       # Run unit test.
       # Currently, no opinioned solution for unit test provided during scaffolding, so,
       # set up any unit test framework you prefer (for example, mocha or jest) and update the commands accordingly in below.
-      # - name: Run Unit Test
-      #   run: cd tabs && npm run test
+      #- name: Run Unit Test
+      #  run: cd tabs && npm run test
 
       # We suggest to do the provision steps by case manually or in a separated workflow, so just comment the following steps for references.
       # After provision, you should commit .fx/env.default.json into the repository for later use.
@@ -54,17 +53,24 @@ jobs:
         uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "chore: commit provision configs"
-          file_pattern: .fx/env.default.json
+          file_pattern: .fx/*
+      
+      - name: Upload default.userdata as artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: defaultUserData
+          path: .fx/default.userdata
+      
+      #- name: Generate default.userdata
+      #  env:
+      #    USERDATA_TENANT_ID: ${{ secrets.USERDATA_TENANT_ID }}
+      #    USERDATA_CLIENT_SECRET: ${{ secrets.USERDATA_CLIENT_SECRET }}
+      #    USERDATA_BOT_PASSWORD: ${{ secrets.USERDATA_BOT_PASSWORD }}
+      #  run: |
+      #    [ ! -z "${USERDATA_TENANT_ID}" ] && echo "solution.teamsAppTenantId=${USERDATA_TENANT_ID}" >> .fx/default.userdata
+      #    [ ! -z "${USERDATA_CLIENT_SECRET}" ] && echo "fx-resource-aad-app-for-teams.clientSecret=${USERDATA_CLIENT_SECRET}" >> .fx/default.userdata
+      #    [ ! -z "${USERDATA_BOT_PASSWORD}" ] && echo "fx-resource-bot.botPassword=${USERDATA_BOT_PASSWORD}" >> .fx/default.userdata
 
-      # - name: Generate default.userdata
-      #   env:
-      #     USERDATA_TENANT_ID: ${{ secrets.USERDATA_TENANT_ID }}
-      #     USERDATA_CLIENT_SECRET: ${{ secrets.USERDATA_CLIENT_SECRET }}
-      #     USERDATA_BOT_PASSWORD: ${{ secrets.USERDATA_BOT_PASSWORD }}
-      #   run: |
-      #     [ ! -z "${USERDATA_TENANT_ID}" ] && echo "solution.teamsAppTenantId=${USERDATA_TENANT_ID}" >> .fx/default.userdata
-      #     [ ! -z "${USERDATA_CLIENT_SECRET}" ] && echo "fx-resource-aad-app-for-teams.clientSecret=${USERDATA_CLIENT_SECRET}" >> .fx/default.userdata
-      #     [ ! -z "${USERDATA_BOT_PASSWORD}" ] && echo "fx-resource-bot.botPassword=${USERDATA_BOT_PASSWORD}" >> .fx/default.userdata
       - name: Deploy to hosting environment
         uses: OfficeDev/teamsfx-cli-action@v1
         with:
